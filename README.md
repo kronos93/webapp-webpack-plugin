@@ -118,7 +118,13 @@ plugins: [
     prefix: 'assets/',
     // Inject html links/metadata (requires html-webpack-plugin)
     inject: true,
-
+    // Alter the result of favicons library before emit to webpack
+    // Note: Only alter the behavior if you know the possible results
+    alterFaviconsEmit: (result, options) => {
+      // You can test:
+      // console.log(result);
+      return result;
+    },
     // Favicons configuration options (see below)
     favicons: {
       ...
