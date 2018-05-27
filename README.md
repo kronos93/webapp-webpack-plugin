@@ -121,9 +121,10 @@ plugins: [
     // Alter the result of favicons library before emit to webpack
     // Note: Only alter the behavior if you know the possible results
     alterFaviconsEmit: (result, options) => {
+      // All changes can be put here
       // You can test:
       // console.log(result);
-      return result;
+      return result; // Return result without changes
     },
     // Favicons configuration options (see below)
     favicons: {
