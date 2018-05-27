@@ -15,7 +15,10 @@ module.exports = class WebappWebpackPlugin {
       favicons: {},
       inject: true,
       alterFaviconsEmit: (result, options) => {
-        return result;
+        // All changes can be put here
+        // You can test:
+        // console.log(result);
+        return result; // Return result without changes
       },
     }, options);
   }

@@ -33,7 +33,7 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory, 
       const output = getAssetPath(compilation, filename, { hash, chunk });
       let result = msgpack.decode(Buffer.from(eval(assets[output].source()), 'base64'));
 
-      // result = alterFaviconsEmit(result, options);
+      result = alterFaviconsEmit(result, options);
 
       delete compilation.assets[output];
       for (const { name, contents } of result.assets) {
