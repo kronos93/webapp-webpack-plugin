@@ -2,11 +2,11 @@ const path = require('path');
 const assert = require('assert');
 const child = require('./compiler');
 const Oracle = require('./oracle');
-const {tap} = require('./compat');
+const { tap } = require('./compat');
 
 module.exports = class WebappWebpackPlugin {
   constructor(args) {
-    const options = (typeof args === 'string') ? {logo: args} : args;
+    const options = (typeof args === 'string') ? { logo: args } : args;
     assert(typeof options === 'object' && typeof options.logo === 'string', 'An input file is required');
 
     this.options = Object.assign({
@@ -14,6 +14,9 @@ module.exports = class WebappWebpackPlugin {
       prefix: 'assets/',
       favicons: {},
       inject: true,
+      alterFaviconsEmit: (result, options) => {
+        return result;
+      },
     }, options);
   }
 
