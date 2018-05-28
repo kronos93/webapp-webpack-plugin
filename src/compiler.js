@@ -2,8 +2,9 @@ const path = require('path');
 const msgpack = require('msgpack-lite');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 const { getAssetPath } = require('./compat');
+const AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
 
-module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory, alterFaviconsEmit }, context, compilation) => {
+module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }, context, compilation) => {
   // The entry file is just an empty helper
   const filename = '[hash]';
   const publicPath = compilation.outputOptions.publicPath;
@@ -22,6 +23,8 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory, 
 
   new SingleEntryPlugin(context, `!${cache}${loader}!${logo}`, path.basename(logo)).apply(compiler);
 
+  compilation.hooks.webappWebpackPluginBeforeEmit = new AsyncSeriesWaterfallHook(['result']);
+
   // Compile and return a promise
   return new Promise((resolve, reject) => {
     compiler.runAsChild((err, [chunk] = [], { hash, errors = [], assets = {} } = {}) => {
@@ -31,19 +34,20 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory, 
 
       // Replace [hash] placeholders in filename
       const output = getAssetPath(compilation, filename, { hash, chunk });
-      let result = msgpack.decode(Buffer.from(eval(assets[output].source()), 'base64'));
-
-      result = alterFaviconsEmit(result, options);
+      const result = msgpack.decode(Buffer.from(eval(assets[output].source()), 'base64'));
 
       delete compilation.assets[output];
-      for (const { name, contents } of result.assets) {
-        compilation.assets[name] = {
-          source: () => contents,
-          size: () => contents.length,
-        };
-      }
 
-      return resolve(result.html);
+      return compilation.hooks.webappWebpackPluginBeforeEmit.promise(result).then(({ html, assets }) => {
+        for (const { name, contents } of result.assets) {
+          compilation.assets[name] = {
+            source: () => contents,
+            size: () => contents.length,
+          };
+        }
+
+        return resolve(result.html);
+      });
     });
   });
 };
