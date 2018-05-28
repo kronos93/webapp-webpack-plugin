@@ -118,14 +118,6 @@ plugins: [
     prefix: 'assets/',
     // Inject html links/metadata (requires html-webpack-plugin)
     inject: true,
-    // Alter the result of favicons library before emit to webpack
-    // Note: Only alter the behavior if you know the possible results
-    alterFaviconsEmit: (result, options) => {
-      // All changes can be put here
-      // You can test:
-      // console.log(result);
-      return result; // Return result without changes
-    },
     // Favicons configuration options (see below)
     favicons: {
       ...
@@ -169,6 +161,31 @@ plugins: [
     }
   })
 ]
+```
+
+## Events
+
+To allow other plugins catch and customise the result of Favicons Library before this plugin emits all the assets, this plugin executes the following events:
+
+### AsyncSeriesWaterfallHook
+
+* `webappWebpackPluginBeforeEmit`
+
+Example implementation:
+
+````js
+  new class {
+    apply(compiler) {
+      compiler.hooks.make.tapAsync("A", (compilation, callback) => {
+        compilation.hooks.webappWebpackPluginBeforeEmit.tapAsync("B", (result, callback) => {
+          console.log(result);
+          return callback(null, result);
+        });
+
+        return callback();
+      })
+    }
+  }
 ```
 
 ## Contribution
