@@ -23,7 +23,9 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }
 
   new SingleEntryPlugin(context, `!${cache}${loader}!${logo}`, path.basename(logo)).apply(compiler);
 
-  compilation.hooks.webappWebpackPluginBeforeEmit = new AsyncSeriesWaterfallHook(['result']);
+  if(compilation.hooks) {
+    compilation.hooks.webappWebpackPluginBeforeEmit = new AsyncSeriesWaterfallHook(['result']);
+  }
 
   // Compile and return a promise
   return new Promise((resolve, reject) => {
@@ -38,16 +40,26 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }
 
       delete compilation.assets[output];
 
-      return compilation.hooks.webappWebpackPluginBeforeEmit.promise(result).then(({ html, assets }) => {
-        for (const { name, contents } of result.assets) {
+      if(compilation.hooks) {
+        return compilation.hooks.webappWebpackPluginBeforeEmit.promise(result).then(({ html, assets }) => {
+          for (const { name, contents } of result.assets) {
+            compilation.assets[name] = {
+              source: () => contents,
+              size: () => contents.length,
+            };
+          }
+  
+          return resolve(result.html);
+        });
+      } else {
+        for (const {name, contents} of result.assets) {
           compilation.assets[name] = {
             source: () => contents,
             size: () => contents.length,
           };
         }
-
         return resolve(result.html);
-      });
+      }
     });
   });
 };
