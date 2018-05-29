@@ -163,13 +163,13 @@ plugins: [
 ]
 ```
 
-## Events
+## Hooks
 
-To allow other plugins catch and customise the result of Favicons Library before this plugin emits all the assets, this plugin executes the following events:
+To allow other plugins to intercept and customise assets before they are emitted, the following hooks may be tapped
 
-### AsyncSeriesWaterfallHook
+### webappWebpackPluginBeforeEmit
 
-* `webappWebpackPluginBeforeEmit`
+> AsyncSeriesWaterfallHook
 
 Example implementation:
 
