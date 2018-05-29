@@ -2,7 +2,6 @@ const path = require('path');
 const msgpack = require('msgpack-lite');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 const { getAssetPath } = require('./compat');
-const AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
 
 module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }, context, compilation) => {
   // The entry file is just an empty helper
@@ -24,6 +23,7 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }
   new SingleEntryPlugin(context, `!${cache}${loader}!${logo}`, path.basename(logo)).apply(compiler);
 
   if(compilation.hooks) {
+    const AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
     compilation.hooks.webappWebpackPluginBeforeEmit = new AsyncSeriesWaterfallHook(['result']);
   }
 
