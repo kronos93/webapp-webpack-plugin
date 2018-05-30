@@ -40,20 +40,20 @@ module.exports.run = ({ prefix, favicons: options, logo, cache: cacheDirectory }
 
       delete compilation.assets[output];
 
-      waterfall(compilation, 'webapp-webpack-plugin-before-emit', result, (error, { html, assets } = {}) => {
-          if (error) {
-            return reject(error);
-          }
-
-          for (const { name, contents } of assets) {
-            compilation.assets[name] = {
-              source: () => contents,
-              size: () => contents.length,
-            };
-          }
-
-          return resolve(html);
+      waterfall(compilation, 'webapp-webpack-plugin-before-emit', result, (error, { html = '', assets = [] } = {}) => {
+        if (error) {
+          return reject(error);
         }
+
+        for (const { name, contents } of assets) {
+          compilation.assets[name] = {
+            source: () => contents,
+            size: () => contents.length,
+          };
+        }
+
+        return resolve(html);
+      }
       );
     });
   });
