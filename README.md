@@ -179,7 +179,7 @@ Example implementation:
       compiler.hooks.make.tapAsync("A", (compilation, callback) => {
         compilation.hooks.webappWebpackPluginBeforeEmit.tapAsync("B", (result, callback) => {
           // The result of favicons library can be modified here
-          // and it will be returned to WebApp Plugin to be emit, be careful.
+          // and it will be returned to WebApp Plugin to be emitted.
           // Add your custom functions below
           console.log(result);
           // Return the custom result
